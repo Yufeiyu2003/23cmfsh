@@ -17,15 +17,12 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points):
     # # plane = ax + by = 0
 
     ans = []
-    print("a")
     for i in range(4):
         # 求距离
         distance = np.abs(np.sum(plane_vector * mirror_points[i]))/mod_v
         multiple = distance/mod_v
 
         mirror_points[i] += mirror_to_column*multiple
-        print(mirror_points)
-
 
     # 将坐标二维化  法向量和y轴重合
     
