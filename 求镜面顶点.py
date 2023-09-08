@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.linalg as sl
 
-import matplotlib.pyplot as plt
 def get_mirror_point(mid_point,normal_vector,H,W,IS_PLOT = False):
 
     #异常处理
@@ -51,6 +50,7 @@ def get_mirror_point(mid_point,normal_vector,H,W,IS_PLOT = False):
     mirror_points = mid_point + rotated_points
     
     if(IS_PLOT== True) :
+        import matplotlib.pyplot as plt
         # 画图
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
