@@ -1,6 +1,8 @@
 import numpy as np
 import scipy.linalg as sl
 from 求镜面法向量 import HEATING_TOWER_CENTER
+
+#余弦效率
 def eta_cos(alpha_s,gamma_s,mirror_point):
     #https://www.researching.cn/ArticlePdf/m00006/2010/30/9/2010-09-2652.pdf 式(6)
     #alpha_s:太阳高度角
@@ -16,6 +18,16 @@ def eta_cos(alpha_s,gamma_s,mirror_point):
 
     eta_cos = np.sqrt(2)/2 * ( np.sin(alpha_s) * np.cos(lambda_s) -np.cos(theta_H- gamma_s)*np.cos(alpha_s)*np.sin(lambda_s) +1 )**0.5
     return eta_cos
+
+#大气投射率
+def eta_at(mirror_point):
+    d_hr = np.linalg.norm(mirror_point - HEATING_TOWER_CENTER)
+    eta_at  = 0.99321 - 0.0001176*d_hr + 1.97e-8*d_hr**2
+    return eta_at
+
+#镜面反射率
+def eta_ref():
+    return 0.92
 
 # if __name__ == "__main__":
 #     print(eta_cos(0.00004*np.pi/180,178*np.pi/180 ,np.array([-1,-50,6])))
