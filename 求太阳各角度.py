@@ -49,10 +49,17 @@ def get_gamma_s(phi,Day,hour):
             Day，以春分为第0天的第Day天
             hour，时间
     '''
+    cos_gamma = get_cos_gamma_s(phi,Day,hour)
+    #限制在[-1,1]范围内
+    if(cos_gamma>1):
+        cos_gamma = 1
+    elif(cos_gamma<-1):
+        cos_gamma = -1
+
     if(hour<=12):
-        angle= np.arccos(get_cos_gamma_s(phi,Day,hour))
+        angle= np.arccos(cos_gamma)
     else:
-        angle=  2*np.pi - np.arccos(get_cos_gamma_s(phi,Day,hour))
+        angle=  2*np.pi - np.arccos(cos_gamma)
         if(angle>np.pi):
             angle = angle - 2*np.pi
     return angle
