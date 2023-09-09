@@ -17,7 +17,7 @@ def get_sun(Day,Hour,phi):
     return alpha_s,gamma_s,sun_vector
 
 
-def get_efficiency( alpha_s,gamma_s,sun_vector,ID, mirror_point,L,W,data,dis_matrix):
+def get_efficiency( alpha_s,gamma_s,sun_vector,ID, mirror_point,L,W,data,dis_matrix,tower_shape_):
     '''
     alpha_s:太阳高度角
     gamma_s:太阳方位角
@@ -25,6 +25,7 @@ def get_efficiency( alpha_s,gamma_s,sun_vector,ID, mirror_point,L,W,data,dis_mat
     mirror_point:镜子中心点
     L:镜子长度
     W:镜子宽度
+    tower_shape_:此时塔影
     '''
     
 
@@ -40,22 +41,22 @@ def get_efficiency( alpha_s,gamma_s,sun_vector,ID, mirror_point,L,W,data,dis_mat
     eta_at = ef.eta_at(mirror_point)
     eta_ref = ef.eta_ref()
     #截断效率,阴影效率:
-    eta_trunc,eta_sb = emr.e_mirror_rate(ID,alpha_s,sun_vector,data,dis_matrix)
+    eta_trunc,eta_sb = emr.e_mirror_rate(ID,alpha_s,sun_vector,data,dis_matrix,tower_shape_)
     
 
-    #总效率
-    if(eta_cos<0):
-        print("eta_cos<0")
-    if(eta_at<0):
-        print("eta_at<0")
-    if(eta_ref<0):
-        print("eta_ref<0")
-    if(eta_trunc<0):
-        print("eta_trunc<0")
+    # #总效率
+    # if(eta_cos<0):
+    #     print("eta_cos<0")
+    # if(eta_at<0):
+    #     print("eta_at<0")
+    # if(eta_ref<0):
+    #     print("eta_ref<0")
+    # if(eta_trunc<0):
+    #     print("eta_trunc<0")
     eta = eta_cos * eta_at * eta_ref * eta_trunc * eta_sb
 
     all_eta = { "eta":eta, "eta_cos":eta_cos, "eta_at":eta_at,"eta_trunc":eta_trunc, "eta_sb":eta_sb}
-    print("第","ID","个镜子效率:",all_eta)
+    #print("第",ID,"个镜子效率:",all_eta)
     return all_eta
 
 
@@ -73,9 +74,11 @@ def E_field(mirrors,dis_matrix,Day,Hour,phi,H):
     '''
     #环境数据
     alpha_s,gamma_s,sun_vector = get_sun(Day,Hour,phi)
+    tower_shape_ = emr.tower_shape(sun_vector)
+
     DNI_value = DNI.get_DNI(alpha_s,H)
-    if(DNI_value<0):
-        print("DNI<0")
+    # if(DNI_value<0):
+    #     print("DNI<0")
     #每个镜子
     #mirror_point = mirrors[0:3]
     Ps =[]
@@ -83,7 +86,7 @@ def E_field(mirrors,dis_matrix,Day,Hour,phi,H):
     for id in range(len(mirrors)):
         mirror = mirrors[id]
         #效率
-        efficiency = get_efficiency(alpha_s,gamma_s,sun_vector,id ,mirror[0:3],mirror[3],mirror[4],mirrors,dis_matrix)
+        efficiency = get_efficiency(alpha_s,gamma_s,sun_vector,id ,mirror[0:3],mirror[3],mirror[4],mirrors,dis_matrix,tower_shape_)
         #输出功率:DNI*镜面面积*效率
         Areas.append(mirror[3]*mirror[4])
         P = efficiency["eta"] * mirror[3] * mirror[4] * DNI_value
