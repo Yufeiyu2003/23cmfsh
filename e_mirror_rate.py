@@ -38,7 +38,7 @@ def range_result(data):
     return result
 
 
-def e_mirror_rate(ID,phi,day,hour,data):
+def e_mirror_rate(ID,phi,day,hour,data,result):
     '''
         
         返回 单面镜子 集热塔截断面积占比  截断效率
@@ -54,8 +54,6 @@ def e_mirror_rate(ID,phi,day,hour,data):
     sun_vector = get_sun_vector(sun_alpha,get_gamma_s(phi,day,hour))
     mirror_column = get_mirror_out_vector(mirror_center_point)
     mirror_points = get_mirror_point(mirror_center_point,get_mirror_normal_vector(mirror_center_point,sun_vector,mirror_column),data[ID,3],data[ID,4])
-
-    result = range_result(data)
 
 
     print(mirror_points)
