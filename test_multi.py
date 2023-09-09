@@ -6,7 +6,7 @@ def distance(P1, P2):
 
 def compute_distance(i, j, data):
     if i < j:
-        return distance(data[i, 0:1], data[j, 0:1])
+        return distance(data[i, 0:2], data[j, 0:2])
     else:
         return 0
 
