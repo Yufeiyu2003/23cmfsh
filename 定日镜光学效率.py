@@ -4,6 +4,7 @@ import 求太阳各角度 as sa
 import 求镜面法向量 as mn
 import 求镜面顶点 as mv
 import 各效率 as ef
+import e_mirror_rate as emr
 import DNI
 def get_sun(Day,Hour,phi):
     #太阳高度角
@@ -16,7 +17,7 @@ def get_sun(Day,Hour,phi):
     return alpha_s,gamma_s,sun_vector
 
 
-def get_efficiency( alpha_s,gamma_s,sun_vector, mirror_point,L,W):
+def get_efficiency( alpha_s,gamma_s,sun_vector,ID, mirror_point,L,W,data,dis_matrix):
     '''
     alpha_s:太阳高度角
     gamma_s:太阳方位角
@@ -38,23 +39,28 @@ def get_efficiency( alpha_s,gamma_s,sun_vector, mirror_point,L,W):
     eta_cos = ef.eta_cos(alpha_s,gamma_s,mirror_point)
     eta_at = ef.eta_at(mirror_point)
     eta_ref = ef.eta_ref()
-    #截断效率:
-
-    #阴影效率:
+    #截断效率,阴影效率:
+    eta_trunc,eta_sb = emr.e_mirror_rate(ID,alpha_s,sun_vector,data,dis_matrix)
+    
 
     #总效率
     if(eta_cos<0):
         print("eta_cos<0")
     if(eta_at<0):
         print("eta_at<0")
-    eta = eta_cos * eta_at * eta_ref
+    if(eta_ref<0):
+        print("eta_ref<0")
+    if(eta_trunc<0):
+        print("eta_trunc<0")
+    eta = eta_cos * eta_at * eta_ref * eta_trunc * eta_sb
 
-
-    return { "eta":eta, "eta_cos":eta_cos, "eta_at":eta_at}
+    all_eta = { "eta":eta, "eta_cos":eta_cos, "eta_at":eta_at,"eta_trunc":eta_trunc, "eta_sb":eta_sb}
+    print("第","ID","个镜子效率:",all_eta)
+    return all_eta
 
 
 #d定日镜场输出热功率
-def E_field(mirrors,Day,Hour,phi,H):
+def E_field(mirrors,dis_matrix,Day,Hour,phi,H):
     '''
     mirrors:镜子列表[底座x,底座y,安装高度z,尺寸长l,尺寸宽w]
 
@@ -74,9 +80,10 @@ def E_field(mirrors,Day,Hour,phi,H):
     #mirror_point = mirrors[0:3]
     Ps =[]
     Areas=[]
-    for mirror in mirrors:
+    for id in range(len(mirrors)):
+        mirror = mirrors[id]
         #效率
-        efficiency = get_efficiency(alpha_s,gamma_s,sun_vector,mirror[0:3],mirror[3],mirror[4])
+        efficiency = get_efficiency(alpha_s,gamma_s,sun_vector,id ,mirror[0:3],mirror[3],mirror[4],mirrors,dis_matrix)
         #输出功率:DNI*镜面面积*效率
         Areas.append(mirror[3]*mirror[4])
         P = efficiency["eta"] * mirror[3] * mirror[4] * DNI_value
