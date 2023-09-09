@@ -4,8 +4,12 @@
 """
 # 集热器中心点(column_center)  镜子中心点(mirror_center)  mirror_center:np.array,  column_center=np.array([0,0,76])
 import numpy as np
+from IntersectArea import *
 
-def ColumnProjection(mirror_to_column:np.array,mirror_points):
+TC=np.array([0,0,80])
+TOWER = np.array([3.5,-4],[3.5,4],[-3.5,4],[-3.5,-4])
+
+def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     # 通过向量求投射平面
     plane_vector = mirror_to_column.copy()
     plane_vector[2] = 0  # 求出投影平面法向量 非单位
@@ -19,6 +23,12 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points):
     ans = []
     for i in range(4):
         # 求距离
+
+        # 直线距离
+        distance_l = np.sqrt(np.sum(mirror_center**2 + TC**2))
+        # 计算扩散半径
+        ex_range = distance_l*0.0046251555
+        # 垂直距离
         distance = np.abs(np.sum(plane_vector * mirror_points[i]))/mod_v
         multiple = distance/mod_v
 
@@ -35,5 +45,17 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points):
         [sin_,cos_,0],
         [0,0,1]]
     )# 旋转矩阵
-    ans = mirror_points.dot(R)
+    i_points = mirror_points.dot(R)[:,[0,2]]
+    i_points -= np.array([[0,TC[2]],[0,TC[2]]])
+    
+    # 计算放大倍率
+    p1 = i_points[0]
+    p2 = i_points[1]
+    L = np.abs(p1[0]*p2[1]-p1[1]*p2[0])/np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
+    amplify_rate = (ex_range+L)/L
+    o_point = i_points*amplify_rate
+
+
+
+
     return ans
