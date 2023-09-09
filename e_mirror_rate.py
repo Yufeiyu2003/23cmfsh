@@ -16,9 +16,19 @@ import numpy as np
 TC=np.array([0,0,80])
 # 集热塔大小
 TOWER = np.array([[3.5,-4],[3.5,4],[-3.5,4],[-3.5,-4]])  # 集热器形状
+TT = 84
 
 
-def e_mirror_rate(ID,alpha_s,sun_vec,data,result):
+def tower_shape(sun_vector):
+    #柱子阴影
+    
+    tower_top = TT/sun_vector[2]*np.array([sun_vector[0],sun_vector[1]])
+    t = np.array([sun_vector[1],-sun_vector[0]])
+    t = t/np.linalg.norm(t)
+    tower_shape = np.array([3.5*t,-3.5*t,tower_top-3.5*t,tower_top+3.5*t])
+    return tower_shape
+
+def e_mirror_rate(ID,alpha_s,sun_vec,data,result,tower_shape_):
     '''
         
         返回 单面镜子 集热塔截断面积占比  截断效率
@@ -43,6 +53,9 @@ def e_mirror_rate(ID,alpha_s,sun_vec,data,result):
 
 
     "阴影遮挡效率"
+
+    
+
     shadow_area = 0
     #读取附近镜子
     max_range = (data[ID,2]+(data[ID,3]/2))/np.tan(sun_alpha)
@@ -54,6 +67,12 @@ def e_mirror_rate(ID,alpha_s,sun_vec,data,result):
     my_area = poly1.area
     # print(max_range)
     # print(my_points)
+
+    #tower_shape_ = tower_shape(sun_vector)
+
+
+        
+
     for mirror_ID in nearby:
         # 假设附近镜子朝向和自己相差无几
         mirror = data[mirror_ID,0:3]
@@ -62,7 +81,9 @@ def e_mirror_rate(ID,alpha_s,sun_vec,data,result):
         # print(o_points)
         #print(IntersectArea(poly1,o_points)[0])
         shadow_area += IntersectArea(poly1,o_points)[0]
-
+    shadow_area += IntersectArea(my_points,tower_shape_)[0]
+    if shadow_area>my_area:
+        shadow_area = my_area
     #print("shadow_area:",shadow_area,"my_area:",my_area)
     shadow_rate = 1-shadow_area/my_area
 
