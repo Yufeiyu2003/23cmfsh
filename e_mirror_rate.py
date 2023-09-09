@@ -67,7 +67,7 @@ def e_mirror_rate(ID,phi,day,hour,data):
     "阴影遮挡效率"
     shadow_area = 0
     #读取附近镜子
-    max_range = 7/np.tan(sun_alpha)
+    max_range = (data[ID,2]+(data[ID,3]/2))/np.tan(sun_alpha)
     nearby = judge(result,ID,max_range)
 
     #获取自己的投影
