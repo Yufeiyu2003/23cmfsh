@@ -45,17 +45,32 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
         [sin_,cos_,0],
         [0,0,1]]
     )# 旋转矩阵
-    i_points = mirror_points.dot(R)[:,[0,2]]
-    i_points -= np.array([[0,TC[2]],[0,TC[2]]])
+    points = mirror_points.dot(R)[:,[0,2]]
+    points -= np.array([[0,TC[2]],[0,TC[2]]])
     
     # 计算放大倍率
-    p1 = i_points[0]
-    p2 = i_points[1]
+    p1 = points[0]
+    p2 = points[1]
     L = np.abs(p1[0]*p2[1]-p1[1]*p2[0])/np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
-    amplify_rate = (ex_range+L)/L
-    o_point = i_points*amplify_rate
+    o_amplify_rate = (ex_range+L)/L
+    o_points = points*o_amplify_rate
+    i_amplify_rate = (L-ex_range)/L
+    i_points = points*i_amplify_rate
 
+    o_cut_area,o_area = IntersectArea(TOWER,o_points)
+    m_cut_area,m_area = IntersectArea(TOWER,points)
+    i_cut_area,i_area = IntersectArea(TOWER,i_points)
 
+    # 被截断的面积(占自身面积)
+    o_cut_area-=m_cut_area
+    m_cut_area-=i_cut_area
+    # 自身总面积
+    o_area-=m_area
+    m_area-=i_area
 
+    total_energy = i_area + 0.75*m_area + 0.25*o_area
+    residu_energy = i_cut_area + 0.75*m_cut_area + 0.25*o_cut_area
 
-    return ans
+    energy_rate = residu_energy/total_energy
+
+    return energy_rate
