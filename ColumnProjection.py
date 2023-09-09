@@ -14,7 +14,7 @@ TOWER = np.array([[3.5,-4],[3.5,4],[-3.5,4],[-3.5,-4]])
 def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     # 通过向量求投射平面
 
-    #print("传入的坐标：",mirror_points)
+    print("传入的坐标：",mirror_points)
     plane_vector = mirror_to_column.copy()
     plane_vector[2] = 0  # 求出投影平面法向量 非单位
 
@@ -36,7 +36,7 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
         multiple = distance/mod_v
 
         mirror_points[i] += mirror_to_column*multiple
-    #print("投影后坐标",mirror_points)
+    print("投影后坐标",mirror_points)
     # 将坐标二维化  法向量和y轴重合
     
     # 夹角cos值
@@ -54,50 +54,50 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     #print("x",plane_vector[0],"y",plane_vector[1],"mod",mod_v,"cos",cos_,"sin",sin_)
     points = mirror_points.dot(R)[:,[1,2]]
     
-    #print("旋转后的投影坐标",mirror_points.dot(R))
+    print("旋转后的投影坐标",mirror_points.dot(R))
     points -= np.array([[0,TC[2]],[0,TC[2]],[0,TC[2]],[0,TC[2]]])
     
     print("points",points)
 
     m_points = points.copy()
 
-    d10 = points[0]-points[1]
-    d12 = points[2]-points[1]
+    d10 = m_points[0]-m_points[1]
+    d12 = m_points[2]-m_points[1]
     d10 = d10/np.linalg.norm(d10)
     d12 = d12/np.linalg.norm(d12)
     D = d10+d12
     D = D/np.linalg.norm(D)
     #cos_ = np.dot(D,d01)/(np.linalg.norm(a)*np.linalg.norm(b))
-    cosangle = D.dot(d10)/(np.linalg.norm(D) * np.linalg.norm(d10))
+    cosangle = D.dot(d10)
     #arctan2_ = np.arctan2(sin_, cos_)# 角度
-    points[1] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[1]
+    points[1] = -(ex_range/np.sin(np.arccos(cosangle)))*D + m_points[1]
     
-    d01 = points[1]-points[0]
-    d03 = points[3]-points[0]
+    d01 = m_points[1]-m_points[0]
+    d03 = m_points[3]-m_points[0]
     d01 = d01/np.linalg.norm(d01)
     d03 = d03/np.linalg.norm(d03)
     D = d01+d03
     D = D/np.linalg.norm(D)
-    cosangle = D.dot(d01)/(np.linalg.norm(D) * np.linalg.norm(d01))
-    points[0] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[0]    
+    cosangle = D.dot(d01)
+    points[0] = -(ex_range/np.sin(np.arccos(cosangle)))*D + m_points[0]    
     
-    d21 = points[1]-points[2]
-    d23 = points[3]-points[2]
+    d21 = m_points[1]-m_points[2]
+    d23 = m_points[3]-m_points[2]
     d21 = d21/np.linalg.norm(d21)
     d23 = d23/np.linalg.norm(d23)
     D = d21+d23
     D = D/np.linalg.norm(D)
-    cosangle = D.dot(d21)/(np.linalg.norm(D) * np.linalg.norm(d21))
-    points[2] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[2]    
+    cosangle = D.dot(d21)
+    points[2] = -(ex_range/np.sin(np.arccos(cosangle)))*D + m_points[2]    
     
-    d30 = points[0]-points[3]
-    d32 = points[2]-points[3] 
+    d30 = m_points[0]-m_points[3]
+    d32 = m_points[2]-m_points[3] 
     d30 = d30/np.linalg.norm(d30)
     d32 = d32/np.linalg.norm(d32)
     D = d30+d32
     D = D/np.linalg.norm(D)
-    cosangle = D.dot(d30)/(np.linalg.norm(D) * np.linalg.norm(d30))
-    points[3] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[3]
+    cosangle = D.dot(d30)
+    points[3] = -(ex_range/np.sin(np.arccos(cosangle)))*D + m_points[3]
 
 
     # tower = Polygon(TOWER).convex_hull
@@ -106,7 +106,8 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     o_cut_area,o_area = IntersectArea(TOWER,points)
     m_cut_area,m_area = IntersectArea(TOWER,m_points)
     print("afterpoint",points)
-    # print("area:",o_area,"cut_area",o_cut_area)
+    print("marea:",m_area,"cut_area",m_cut_area)
+    print("oarea:",o_area,"cut_area",o_cut_area)
     # # 被截断的面积(占自身面积)
     # o_cut_area-=m_cut_area
     # # 自身总面积
