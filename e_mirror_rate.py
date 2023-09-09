@@ -17,28 +17,8 @@ TC=np.array([0,0,80])
 # 集热塔大小
 TOWER = np.array([[3.5,-4],[3.5,4],[-3.5,4],[-3.5,-4]])  # 集热器形状
 
-def distance(P1, P2):
-    return np.sqrt(np.sum((P1 - P2) ** 2))
 
-def range_result(data):
-    lendata = len(data)
-    result = np.zeros((lendata, lendata))
-    for i in range(lendata):
-        for j in range(lendata):
-            if i < j:
-                result[i][j] = distance(data[i,0:1], data[j,0:1])
-            else:
-                result[i][j] = 0
-    # 把上三角矩阵result转化为对称矩阵
-    for i in range(lendata):
-        for j in range(lendata):
-            if i > j:
-                result[i][j] = result[j][i]
-
-    return result
-
-
-def e_mirror_rate(ID,phi,day,hour,data,result):
+def e_mirror_rate(ID,alpha_s,sun_vec,data,result):
     '''
         
         返回 单面镜子 集热塔截断面积占比  截断效率
@@ -47,16 +27,16 @@ def e_mirror_rate(ID,phi,day,hour,data,result):
         维度phi 时间day hour  -- 太阳照射角度
         镜子中心坐标，  -- 镜子法向量&四角坐标
     '''
-    mirror_center_point = data[ID,0:2]
+    mirror_center_point = data[ID,0:3]
     # print(mirror_center_point)
     # 计算镜子投影位置并旋转
-    sun_alpha = get_alpha_s(phi,day,hour)
-    sun_vector = get_sun_vector(sun_alpha,get_gamma_s(phi,day,hour))
+    sun_alpha = alpha_s
+    sun_vector = sun_vec
     mirror_column = get_mirror_out_vector(mirror_center_point)
     mirror_points = get_mirror_point(mirror_center_point,get_mirror_normal_vector(mirror_center_point,sun_vector,mirror_column),data[ID,3],data[ID,4])
 
 
-    print(mirror_points)
+    #print(mirror_points)
 
     "截断效率"
     cut_rate = ColumnProjection(mirror_column,mirror_points.copy(),mirror_center_point)
@@ -76,8 +56,8 @@ def e_mirror_rate(ID,phi,day,hour,data,result):
     # print(my_points)
     for mirror_ID in nearby:
         # 假设附近镜子朝向和自己相差无几
-        mirror_ID = data[mirror_ID,0:2]
-        m_mirror_points = get_mirror_point(mirror_ID,get_mirror_normal_vector(mirror_ID,sun_vector,mirror_column),data[mirror_ID,3],data[mirror_ID,4])
+        mirror = data[mirror_ID,0:3]
+        m_mirror_points = get_mirror_point(mirror,get_mirror_normal_vector(mirror,sun_vector,mirror_column),data[mirror_ID,3],data[mirror_ID,4])
         o_points = GroundProjection(m_mirror_points.copy(),sun_vector)
         # print(o_points)
         # print(IntersectArea(poly1,o_points)[0])
