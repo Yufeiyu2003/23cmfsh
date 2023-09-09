@@ -14,7 +14,7 @@ TOWER = np.array([[3.5,-4],[3.5,4],[-3.5,4],[-3.5,-4]])
 def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     # 通过向量求投射平面
 
-    print("传入的坐标：",mirror_points)
+    # print("传入的坐标：",mirror_points)
     plane_vector = mirror_to_column.copy()
     plane_vector[2] = 0  # 求出投影平面法向量 非单位
 
@@ -36,7 +36,7 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
         multiple = distance/mod_v
 
         mirror_points[i] += mirror_to_column*multiple
-    print("投影后坐标",mirror_points)
+    # print("投影后坐标",mirror_points)
     # 将坐标二维化  法向量和y轴重合
     
     # 夹角cos值
@@ -54,10 +54,10 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     #print("x",plane_vector[0],"y",plane_vector[1],"mod",mod_v,"cos",cos_,"sin",sin_)
     points = mirror_points.dot(R)[:,[1,2]]
     
-    print("旋转后的投影坐标",mirror_points.dot(R))
+    #print("旋转后的投影坐标",mirror_points.dot(R))
     points -= np.array([[0,TC[2]],[0,TC[2]],[0,TC[2]],[0,TC[2]]])
     
-    print("points",points)
+    #print("points",points)
 
     m_points = points.copy()
 
@@ -105,9 +105,9 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     #o_cut_area,o_area = IntersectArea(TOWER,o_points)
     o_cut_area,o_area = IntersectArea(TOWER,points)
     m_cut_area,m_area = IntersectArea(TOWER,m_points)
-    print("afterpoint",points)
-    print("marea:",m_area,"cut_area",m_cut_area)
-    print("oarea:",o_area,"cut_area",o_cut_area)
+    # print("afterpoint",points)
+    # print("marea:",m_area,"cut_area",m_cut_area)
+    # print("oarea:",o_area,"cut_area",o_cut_area)
     # # 被截断的面积(占自身面积)
     # o_cut_area-=m_cut_area
     # # 自身总面积
