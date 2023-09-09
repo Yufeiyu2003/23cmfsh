@@ -39,6 +39,7 @@ def get_efficiency( alpha_s,gamma_s,sun_vector, mirror_point,L,W):
     eta_at = ef.eta_at(mirror_point)
     eta_ref = ef.eta_ref()
     #截断效率:
+
     #阴影效率:
 
     #总效率
@@ -55,7 +56,7 @@ def get_efficiency( alpha_s,gamma_s,sun_vector, mirror_point,L,W):
 #d定日镜场输出热功率
 def E_field(mirrors,Day,Hour,phi,H):
     '''
-    mirrors:镜子列表[底座x,底座y,安装高度z,尺寸宽w,尺寸长l]
+    mirrors:镜子列表[底座x,底座y,安装高度z,尺寸长l,尺寸宽w]
 
     Day:天数,以春分为第0天
     Hour:时间,以12:00为第0小时
