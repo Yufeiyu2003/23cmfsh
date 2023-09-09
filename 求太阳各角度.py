@@ -50,9 +50,12 @@ def get_gamma_s(phi,Day,hour):
             hour，时间
     '''
     if(hour<=12):
-        return np.arccos(get_cos_gamma_s(phi,Day,hour))
+        angle= np.arccos(get_cos_gamma_s(phi,Day,hour))
     else:
-        return 2*np.pi - np.arccos(get_cos_gamma_s(phi,Day,hour))
+        angle=  2*np.pi - np.arccos(get_cos_gamma_s(phi,Day,hour))
+        if(angle>np.pi):
+            angle = angle - 2*np.pi
+    return angle
 
 # if __name__ == "__main__":
 #     import 阳光向量
