@@ -6,14 +6,13 @@
 
 import numpy as np
 
-def GroundProjection(point:np.array,vector:np.array):
-    multiple = point[2]/vector[2]
-
-    ans = point + multiple*vector
-
-    ans[1] = 0
-
-    return ans
+def GroundProjection(points:np.array,vector:np.array):
+    for point in points:
+        multiple = point[2]/vector[2]
+        point += multiple*vector
+    
+    return points[:,0:2]
     
     
 
+# np.tile(vector,[4,1])
