@@ -55,7 +55,7 @@ def get_efficiency( alpha_s,gamma_s,sun_vector,ID, mirror_point,L,W,data,dis_mat
     eta = eta_cos * eta_at * eta_ref * eta_trunc * eta_sb
 
     all_eta = { "eta":eta, "eta_cos":eta_cos, "eta_at":eta_at,"eta_trunc":eta_trunc, "eta_sb":eta_sb}
-    print("第","ID","个镜子效率:",all_eta)
+    print("第",ID,"个镜子效率:",all_eta)
     return all_eta
 
 

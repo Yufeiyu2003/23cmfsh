@@ -57,12 +57,13 @@ def e_mirror_rate(ID,alpha_s,sun_vec,data,result):
     for mirror_ID in nearby:
         # 假设附近镜子朝向和自己相差无几
         mirror = data[mirror_ID,0:3]
-        m_mirror_points = get_mirror_point(mirror,get_mirror_normal_vector(mirror,sun_vector,mirror_column),data[mirror_ID,3],data[mirror_ID,4])
+        m_mirror_points = get_mirror_point(mirror,get_mirror_normal_vector(mirror,sun_vector,get_mirror_out_vector(mirror)),data[mirror_ID,3],data[mirror_ID,4])
         o_points = GroundProjection(m_mirror_points.copy(),sun_vector)
         # print(o_points)
-        # print(IntersectArea(poly1,o_points)[0])
+        #print(IntersectArea(poly1,o_points)[0])
         shadow_area += IntersectArea(poly1,o_points)[0]
 
+    #print("shadow_area:",shadow_area,"my_area:",my_area)
     shadow_rate = 1-shadow_area/my_area
 
     return [cut_rate,shadow_rate]
