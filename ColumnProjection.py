@@ -9,6 +9,8 @@ from IntersectArea import *
 TC=np.array([0,0,80])
 TOWER = np.array([[3.5,-4],[3.5,4],[-3.5,4],[-3.5,-4]])
 
+
+
 def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     # 通过向量求投射平面
 
@@ -55,26 +57,63 @@ def ColumnProjection(mirror_to_column:np.array,mirror_points,mirror_center):
     #print("旋转后的投影坐标",mirror_points.dot(R))
     points -= np.array([[0,TC[2]],[0,TC[2]],[0,TC[2]],[0,TC[2]]])
     
-    # 计算放大倍率
-    # p1 = points[0]
-    # p2 = points[1]
-    # L = np.abs(p1[0]*p2[1]-p1[1]*p2[0])/np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
+    print("points",points)
 
+    m_points = points.copy()
+
+    d10 = points[0]-points[1]
+    d12 = points[2]-points[1]
+    d10 = d10/np.linalg.norm(d10)
+    d12 = d12/np.linalg.norm(d12)
+    D = d10+d12
+    D = D/np.linalg.norm(D)
+    #cos_ = np.dot(D,d01)/(np.linalg.norm(a)*np.linalg.norm(b))
+    cosangle = D.dot(d10)/(np.linalg.norm(D) * np.linalg.norm(d10))
+    #arctan2_ = np.arctan2(sin_, cos_)# 角度
+    points[1] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[1]
     
+    d01 = points[1]-points[0]
+    d03 = points[3]-points[0]
+    d01 = d01/np.linalg.norm(d01)
+    d03 = d03/np.linalg.norm(d03)
+    D = d01+d03
+    D = D/np.linalg.norm(D)
+    cosangle = D.dot(d01)/(np.linalg.norm(D) * np.linalg.norm(d01))
+    points[0] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[0]    
+    
+    d21 = points[1]-points[2]
+    d23 = points[3]-points[2]
+    d21 = d21/np.linalg.norm(d21)
+    d23 = d23/np.linalg.norm(d23)
+    D = d21+d23
+    D = D/np.linalg.norm(D)
+    cosangle = D.dot(d21)/(np.linalg.norm(D) * np.linalg.norm(d21))
+    points[2] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[2]    
+    
+    d30 = points[0]-points[3]
+    d32 = points[2]-points[3] 
+    d30 = d30/np.linalg.norm(d30)
+    d32 = d32/np.linalg.norm(d32)
+    D = d30+d32
+    D = D/np.linalg.norm(D)
+    cosangle = D.dot(d30)/(np.linalg.norm(D) * np.linalg.norm(d30))
+    points[3] = -(ex_range/np.sin(np.arccos(cosangle)))*D + points[3]
+
 
     # tower = Polygon(TOWER).convex_hull
 
     #o_cut_area,o_area = IntersectArea(TOWER,o_points)
-    m_cut_area,m_area = IntersectArea(TOWER,points)
-    #print("area:",m_area)
-
+    o_cut_area,o_area = IntersectArea(TOWER,points)
+    m_cut_area,m_area = IntersectArea(TOWER,m_points)
+    print("afterpoint",points)
+    # print("area:",o_area,"cut_area",o_cut_area)
     # # 被截断的面积(占自身面积)
     # o_cut_area-=m_cut_area
     # # 自身总面积
     # o_area-=m_area
 
-    total_energy = m_area
-    residu_energy = m_cut_area
+    total_energy = m_area + 0.25* (o_area - m_area)
+    residu_energy = m_cut_area + 0.25*(o_cut_area - m_cut_area)
 
     energy_rate = residu_energy/total_energy
 
