@@ -1,6 +1,7 @@
 import numpy as np
 import 定日镜光学效率 as eff
 import test_multi
+import multiprocessing
 
 def draw_address(total_ring,同环间距,同环间距改变率,环间距,环间距改变率,high,Delta_high,H,W,是否均匀分散):
     """
@@ -95,11 +96,16 @@ def draw_address(total_ring,同环间距,同环间距改变率,环间距,环间�
 
 
 
-Max = [30,15,1,1,15,1,1,6,1,1,8,8]
+Max = [25,15,1,1,15,1,1,6,1,1,8,8]
 
-min = [18,10,0,0,10,0,0,2,0,0,2,2]
+min = [18,10,0,0,10,0,0,2,0,0,6,6]
+
+phi=39.2*np.pi/180
 
 
+def process_task(args):
+    ps, tal, per = eff.E_field(args[2], args[3], args[0], args[1], phi, 3)
+    return tal, per
 
 def 优化目标(x):
     total_ring = x[0]   # 
@@ -122,20 +128,78 @@ def 优化目标(x):
     ps_m = []
     tal_m = 0
     per_m = 0
-    phi=39.2*np.pi/180
-
+ 
+    global mirrors
+    global result_matrix
     mirrors = draw_address(total_ring,同环间距,同环间距改变率,环间距,环间距改变率,high,Delta_high,H,W,是否均匀分散)
     result_matrix = test_multi.range_result(mirrors[:, 0:2],8)
 
-    for day in [0,92,275]:
-        for hour in [9,12,15]:
-            ps,tal,per=eff.E_field(mirrors,result_matrix,day,hour,phi,3)
-            tal_m += tal
-            per_m += per
-            if day == 0:
-                tal_m += tal
-                per_m += per
-
-
-    return (per_m/(4*3),tal_m/(4*3),mirrors)
     
+
+
+
+
+    
+
+    task_list = [(0, 9,mirrors,result_matrix), (0, 12,mirrors,result_matrix), (0, 15,mirrors,result_matrix), (92, 9,mirrors,result_matrix), (92, 12,mirrors,result_matrix), (92, 15,mirrors,result_matrix), (275, 9,mirrors,result_matrix), (275, 12,mirrors,result_matrix), (275, 15,mirrors,result_matrix),(0, 9,mirrors,result_matrix), (0, 12,mirrors,result_matrix), (0, 15,mirrors,result_matrix)]
+
+    # 创建一个进程池，可以根据需要调整进程数量
+    pool = multiprocessing.Pool(processes=12)
+
+    # 使用pool.map来并行执行任务，并获得结果
+    results = pool.map(process_task, task_list)
+
+    # 关闭进程池
+    pool.close()
+    pool.join()
+
+    # 处理结果
+    tal_m = 0
+    per_m = 0
+    for tal, per in results:
+        tal_m += tal
+        per_m += per
+
+    # for day in [0,92,275]:
+    #     for hour in [11,12,13]:
+    #         ps,tal,per=eff.E_field(mirrors,result_matrix,day,hour,phi,3)
+    #         tal_m += tal
+    #         per_m += per
+    #         if day == 0:
+    #             tal_m += tal
+    #             per_m += per
+
+    if tal_m/12 >= 60000:
+        return 60000+0.1*(tal_m/12) + per_m/12 *50000
+    else:
+        return tal_m/12
+    
+
+
+
+# if __name__ == "__main__":
+#     # 定义要处理的任务列表
+#     task_list = [(0, 9), (0, 12), (0, 15), (92, 9), (92, 12), (92, 15), (275, 9), (275, 12), (275, 15)]
+
+#     # 创建一个进程池，可以根据需要调整进程数量
+#     pool = multiprocessing.Pool(processes=8)
+
+#     # 使用pool.map来并行执行任务，并获得结果
+#     results = pool.map(process_task, task_list)
+
+#     # 关闭进程池
+#     pool.close()
+#     pool.join()
+
+#     # 处理结果
+#     tal_m = 0
+#     per_m = 0
+#     for tal, per in results:
+#         tal_m += tal
+#         per_m += per
+
+#     # 如果需要在day为0时再次添加tal和per，可以在这里添加
+
+#     # 打印最终结果
+#     print("tal_m:", tal_m)
+#     print("per_m:", per_m)
