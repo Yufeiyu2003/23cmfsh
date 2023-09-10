@@ -109,6 +109,7 @@ def process_task(args):
 
 def 优化目标(x):
     total_ring = x[0]   # 
+    total_ring = int(total_ring)
     同环间距 = x[1]
     同环间距改变率 = x[2:4]
     环间距 = x[4]
