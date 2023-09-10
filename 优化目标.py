@@ -53,6 +53,7 @@ def draw_address(total_ring,同环间距,同环间距改变率,环间距,环间�
     for n in range(total_ring):
         R = ring_R(n)
         min_space = 2*np.arcsin(((5+W)/2)/R)
+        同环间距 = 2*np.arcsin(((同环间距)/2)/R)
         if 同环间距>(min_space):
             space = 同环间距
         else:
