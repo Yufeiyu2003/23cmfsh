@@ -48,7 +48,7 @@ def draw_address(total_ring,同环间距,同环间距改变率,环间距,环间�
             return temp
 
     
-
+    
 
     for n in range(total_ring):
         R = ring_R(n)
